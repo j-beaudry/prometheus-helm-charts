@@ -13,4 +13,31 @@ metadata:
 {{ if .Values.secretConfig -}} stringData: {{- else -}} data: {{- end }}
   blackbox.yaml: |
 {{ toYaml .Values.config | indent 4 }}
+{{ if and .Values.dedalus.custom.enabled .Values.dedalus.custom.sescam }}
+{{- range $k, $v := .Values.dedalus.custom.sescam.targets }}
+      http_{{ $v }}:
+        prober: http
+        timeout: {{ $.Values.dedalus.custom.sescam.timeout | default "20s" }}
+        http:
+          method: {{ $.Values.dedalus.custom.sescam.method | default "GET" }}
+          headers:
+            {{ toYaml $.Values.dedalus.custom.sescam.headers | indent 2 }}
+          fail_if_body_not_matches_regexp:
+            {{ toYaml $.Values.dedalus.custom.sescam.regexFail | indent 2 }}
+          body: |
+            <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sch="http://example.com/schema">
+              <soapenv:Header/>
+              <soapenv:Body>
+                <sch:{{ $v }}Request>
+                  <sch:fechaInicio>{{ $.Values.dedalus.custom.sescam.dateStart }}</sch:fechaInicio>
+                  <sch:fechaFin>{{ $.Values.dedalus.custom.sescam.dateEnd }}</sch:fechaFin>
+                  <sch:cliente>{{ $.Values.dedalus.custom.sescam.client | default "Dedalus" }}</sch:cliente>
+                  <sch:pagina>{{ $.Values.dedalus.custom.sescam.page | default "0" }}</sch:pagina>
+                  <sch:registros>{{ $.Values.dedalus.custom.sescam.records | default "10" }}</sch:registros>
+                </sch:{{ $v }}Request>
+              </soapenv:Body>
+            </soapenv:Envelope>
+          url: {{ $.Values.dedalus.custom.sescam.endpoint }}{{ $v }}/srv
+{{- end }}
+{{- end }}
 {{- end }}

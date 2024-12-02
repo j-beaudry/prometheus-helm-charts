@@ -477,3 +477,8 @@ configReloader:
       tlsConfig: {}
       interval: 30s
       scrapeTimeout: 30s
+
+dedalus:
+  custom:
+    enabled: false
+    sescam: {}
