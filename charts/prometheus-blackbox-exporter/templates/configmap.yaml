@@ -37,7 +37,6 @@ metadata:
                 </sch:{{ $v }}Request>
               </soapenv:Body>
             </soapenv:Envelope>
-          url: {{ $.Values.dedalus.custom.sescam.endpoint }}{{ $v }}/srv
 {{- end }}
 {{- end }}
 {{- end }}
